@@ -1,0 +1,133 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Umwälzpumpe Heizgruppe-20</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .status {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            text-align: center;
+            color: green;
+        }
+        .status.exceed {
+            color: red;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            padding: 8px;
+            margin-bottom: 4px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .specs, .maintenance-info {
+            margin-top: 20px;
+        }
+        .value {
+            color: green;
+            font-weight: bold;
+        }
+        .value.exceed {
+            color: red;
+            font-weight: bold;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+    </style>
+    <script>
+        const nominalFlowRate = 3000; // in l/h
+        const nominalPower = 40; // in Watt
+        const nominalPressure = 1.5; // in bar
+        const nominalTemperature = 65; // in °C
+
+        function getRandomValue(nominal, deviation = 0.1) {
+            const min = nominal * (1 - deviation);
+            const max = nominal * (1 + deviation);
+            const value = (Math.random() * (max - min) + min).toFixed(1);
+            return parseFloat(value);
+        }
+
+        function updateValues() {
+            const flowRate = getRandomValue(nominalFlowRate, 0.1);
+            const power = getRandomValue(nominalPower, 0.1);
+            const pressure = getRandomValue(nominalPressure, 0.1);
+            const temperature = getRandomValue(nominalTemperature, 0.1);
+
+            const flowRateElement = document.getElementById("flow_rate");
+            const powerElement = document.getElementById("power");
+            const pressureElement = document.getElementById("pressure");
+            const temperatureElement = document.getElementById("temperature");
+            const statusElement = document.getElementById("status");
+
+            flowRateElement.innerText = flowRate + " l/h";
+            powerElement.innerText = power + " Watt";
+            pressureElement.innerText = pressure + " bar";
+            temperatureElement.innerText = temperature + " °C";
+
+            const exceedsNominal = flowRate > nominalFlowRate * 1.1 || power > nominalPower * 1.1 || pressure > nominalPressure * 1.1 || temperature > nominalTemperature * 1.1;
+            statusElement.className = exceedsNominal ? "status exceed" : "status";
+            statusElement.innerText = exceedsNominal ? "Status: Kritisch" : "Status: Normal";
+
+            flowRateElement.className = flowRate > nominalFlowRate * 1.1 ? "value exceed" : "value";
+            powerElement.className = power > nominalPower * 1.1 ? "value exceed" : "value";
+            pressureElement.className = pressure > nominalPressure * 1.1 ? "value exceed" : "value";
+            temperatureElement.className = temperature > nominalTemperature * 1.1 ? "value exceed" : "value";
+        }
+
+        setInterval(updateValues, 3000);
+    </script>
+</head>
+<body onload="updateValues()">
+    <div class="container">
+        <h1>Umwälzpumpe Heizgruppe-20</h1>
+        <div id="status" class="status">Status: Normal</div>
+        <div>
+            <h2>Hersteller: Wilo</h2>
+            <h3>Produktart: Umwälzpumpe für Heizungsanlagen</h3>
+        </div>
+        <div class="specs">
+            <h2>Allgemeine Spezifikationen</h2>
+            <ul>
+                <li>Modell: Wilo-Stratos PICO 25/1-4</li>
+                <li>Nominale Durchflussrate: 3 m³/h</li>
+                <li>Leistungsaufnahme: 40 Watt</li>
+                <li>Spannung: 230V</li>
+                <li>Materialien: -</li>
+            </ul>
+        </div>
+        <ul>
+            <li>Durchflussrate: <span id="flow_rate" class="value">3000 l/h</span></li>
+            <li>Leistungsaufnahme: <span id="power" class="value">40 Watt</span></li>
+            <li>Druck: <span id="pressure" class="value">1.5 bar</span></li>
+            <li>Temperatur: <span id="temperature" class="value">65.0 °C</span></li>
+        </ul>
+        <div class="maintenance-info">
+            <h2>Wartungsinformationen</h2>
+            <ul>
+                <li>letzte Wartung: 2023-05-15</li>
+                <li>nächste Wartung: 2024-05-15</li>
+                <li>durchgeführt von: Techniker A</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
