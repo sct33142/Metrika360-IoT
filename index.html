@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Umwälzpumpe Heizgruppe-20</title>
+    <title>UWP HG-20</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -17,10 +17,25 @@
             font-size: 1.2em;
             margin-bottom: 20px;
             text-align: center;
-            color: green;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-        .status.exceed {
-            color: red;
+        .status span {
+            margin-left: 10px;
+            width: 15px;
+            height: 15px;
+            display: inline-block;
+            border-radius: 50%;
+        }
+        .status.green span {
+            background-color: green;
+        }
+        .status.orange span {
+            background-color: orange;
+        }
+        .status.red span {
+            background-color: red;
         }
         table {
             width: 100%;
@@ -79,8 +94,8 @@
             temperatureElement.innerText = temperature + " °C";
 
             const exceedsNominal = flowRate > nominalFlowRate * 1.1 || power > nominalPower * 1.1 || pressure > nominalPressure * 1.1 || temperature > nominalTemperature * 1.1;
-            statusElement.className = exceedsNominal ? "status exceed" : "status";
-            statusElement.innerText = exceedsNominal ? "Status: Kritisch" : "Status: Normal";
+            statusElement.className = exceedsNominal ? "status red" : "status green";
+            statusElement.innerHTML = `Status: ${exceedsNominal ? 'Kritisch' : 'Normal'} <span></span>`;
 
             flowRateElement.className = flowRate > nominalFlowRate * 1.1 ? "value exceed" : "value";
             powerElement.className = power > nominalPower * 1.1 ? "value exceed" : "value";
@@ -88,13 +103,40 @@
             temperatureElement.className = temperature > nominalTemperature * 1.1 ? "value exceed" : "value";
         }
 
-        setInterval(updateValues, 3000);
+        function updateMaintenanceStatus() {
+            const maintenanceStatusElement = document.getElementById("maintenance_status");
+            const nextMaintenanceDateElement = document.getElementById("next_maintenance_date");
+            const today = new Date();
+            const nextMaintenanceDate = new Date(today);
+            nextMaintenanceDate.setDate(nextMaintenanceDate.getDate() + Math.floor(Math.random() * 60)); // Random date within the next 60 days
+            nextMaintenanceDateElement.innerText = nextMaintenanceDate.toISOString().split('T')[0];
+
+            const oneMonthBeforeMaintenance = new Date(nextMaintenanceDate);
+            oneMonthBeforeMaintenance.setMonth(oneMonthBeforeMaintenance.getMonth() - 1);
+
+            if (today > nextMaintenanceDate) {
+                maintenanceStatusElement.className = "status red";
+                maintenanceStatusElement.innerHTML = "Überfällig <span></span>";
+            } else if (today > oneMonthBeforeMaintenance) {
+                maintenanceStatusElement.className = "status orange";
+                maintenanceStatusElement.innerHTML = "Bald fällig <span></span>";
+            } else {
+                maintenanceStatusElement.className = "status green";
+                maintenanceStatusElement.innerHTML = "Normal <span></span>";
+            }
+        }
+
+        window.onload = function() {
+            updateValues();
+            updateMaintenanceStatus();
+            setInterval(updateValues, 3000);
+        };
     </script>
 </head>
-<body onload="updateValues()">
+<body>
     <div class="container">
-        <h1>Umwälzpumpe Heizgruppe-20</h1>
-        <div id="status" class="status">Status: Normal</div>
+        <h1>UWP HG-20</h1>
+        <div id="status" class="status">Status: Normal <span></span></div>
 
         <h2>Live-Daten</h2>
         <table>
@@ -127,16 +169,20 @@
                 <th>Wert</th>
             </tr>
             <tr>
+                <td>Status</td>
+                <td id="maintenance_status" class="status green">Normal <span></span></td>
+            </tr>
+            <tr>
                 <td>Letzte Wartung</td>
                 <td>2023-05-15</td>
             </tr>
             <tr>
                 <td>Nächste Wartung</td>
-                <td>2024-05-15</td>
+                <td id="next_maintenance_date">2024-05-15</td>
             </tr>
             <tr>
                 <td>Durchgeführt von</td>
-                <td>Techniker A</td>
+                <td>Techniker Müller</td>
             </tr>
         </table>
 
