@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>{TITLE}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .status {
+            font-size: 0.8em;
+            margin-bottom: 20px;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .status span {
+            margin-left: 10px;
+            width: 10px;
+            height: 10px;
+            display: inline-block;
+            border-radius: 50%;
+        }
+        .status.green span {
+            background-color: green;
+        }
+        .status.orange span {
+            background-color: orange;
+        }
+        .status.red span {
+            background-color: red;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .value {
+            color: green;
+            font-weight: bold;
+        }
+        .value.exceed {
+            color: red;
+            font-weight: bold;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+    </style>
+    <script>
+        const nominalFlowRate = 3000; // in l/h
+        const nominalPower = 40; // in Watt
+        const nominalPressure = 1.5; // in bar
+        const nominalTemperature = 65; // in °C
+
+        function getRandomValue(nominal, deviation = 0.05) {
+            const min = nominal * (1 - deviation);
+            const max = nominal * (1 + deviation);
+            const value = (Math.random() * (max - min) + min).toFixed(1);
+            return parseFloat(value);
+        }
+
+        function updateValues() {
+            const flowRate = getRandomValue(nominalFlowRate, 0.05);
+            const power = getRandomValue(nominalPower, 0.05);
+            const pressure = getRandomValue(nominalPressure, 0.05);
+            const temperature = getRandomValue(nominalTemperature, 0.05);
+
+            const flowRateElement = document.getElementById("flow_rate");
+            const powerElement = document.getElementById("power");
+            const pressureElement = document.getElementById("pressure");
+            const temperatureElement = document.getElementById("temperature");
+            const statusElement = document.getElementById("status");
+
+            flowRateElement.innerText = flowRate + " l/h";
+            powerElement.innerText = power + " Watt";
+            pressureElement.innerText = pressure + " bar";
+            temperatureElement.innerText = temperature + " °C";
+
+            const exceedsNominal = flowRate > nominalFlowRate * 1.1 || power > nominalPower * 1.1 || pressure > nominalPressure * 1.1 || temperature > nominalTemperature * 1.1;
+            statusElement.className = exceedsNominal ? "status red" : "status green";
+            statusElement.innerHTML = `Status: ${exceedsNominal ? 'Kritisch' : 'Normal'} <span></span>`;
+
+            flowRateElement.className = flowRate > nominalFlowRate * 1.1 ? "value exceed" : "value";
+            powerElement.className = power > nominalPower * 1.1 ? "value exceed" : "value";
+            pressureElement.className = pressure > nominalPressure * 1.1 ? "value exceed" : "value";
+            temperatureElement.className = temperature > nominalTemperature * 1.1 ? "value exceed" : "value";
+        }
+
+        function getNextMaintenanceDate() {
+            const storedDate = localStorage.getItem('nextMaintenanceDate');
+            if (storedDate) {
+                return new Date(storedDate);
+            } else {
+                const today = new Date();
+                const nextMaintenanceDate = new Date(today);
+                nextMaintenanceDate.setMonth(nextMaintenanceDate.getMonth() + 1);
+                localStorage.setItem('nextMaintenanceDate', nextMaintenanceDate.toISOString().split('T')[0]);
+                return nextMaintenanceDate;
+            }
+        }
+
+        function updateMaintenanceStatus() {
+            const maintenanceStatusElement = document.getElementById("maintenance_status");
+            const nextMaintenanceDateElement = document.getElementById("next_maintenance_date");
+            const today = new Date();
+            const nextMaintenanceDate = getNextMaintenanceDate();
+            nextMaintenanceDateElement.innerText = nextMaintenanceDate.toISOString().split('T')[0];
+
+            const oneMonthBeforeMaintenance = new Date(nextMaintenanceDate);
+            oneMonthBeforeMaintenance.setMonth(oneMonthBeforeMaintenance.getMonth() - 1);
+
+            if (today > nextMaintenanceDate) {
+                maintenanceStatusElement.className = "status red";
+                maintenanceStatusElement.innerHTML = "Überfällig <span></span>";
+            } else if (today > oneMonthBeforeMaintenance) {
+                maintenanceStatusElement.className = "status orange";
+                maintenanceStatusElement.innerHTML = "Bald fällig <span></span>";
+            } else {
+                maintenanceStatusElement.className = "status green";
+                maintenanceStatusElement.innerHTML = "Normal <span></span>";
+            }
+        }
+
+        window.onload = function() {
+            updateValues();
+            updateMaintenanceStatus();
+            setInterval
