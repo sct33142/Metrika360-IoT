@@ -78,4 +78,156 @@
 
         function updateValues() {
             const flowRate = getRandomValue(nominalFlowRate, 0.05);
-            const |oai:code-citation|
+            const
+
+ power = getRandomValue(nominalPower, 0.05);
+            const pressure = getRandomValue(nominalPressure, 0.05);
+            const temperature = getRandomValue(nominalTemperature, 0.05);
+
+            const flowRateElement = document.getElementById("flow_rate");
+            const powerElement = document.getElementById("power");
+            const pressureElement = document.getElementById("pressure");
+            const temperatureElement = document.getElementById("temperature");
+            const statusElement = document.getElementById("status");
+
+            flowRateElement.innerText = flowRate + " l/h";
+            powerElement.innerText = power + " Watt";
+            pressureElement.innerText = pressure + " bar";
+            temperatureElement.innerText = temperature + " °C";
+
+            const exceedsNominal = flowRate > nominalFlowRate * 1.1 || power > nominalPower * 1.1 || pressure > nominalPressure * 1.1 || temperature > nominalTemperature * 1.1;
+            statusElement.className = exceedsNominal ? "status red" : "status green";
+            statusElement.innerHTML = `Status: ${exceedsNominal ? 'Kritisch' : 'Normal'} <span></span>`;
+
+            flowRateElement.className = flowRate > nominalFlowRate * 1.1 ? "value exceed" : "value";
+            powerElement.className = power > nominalPower * 1.1 ? "value exceed" : "value";
+            pressureElement.className = pressure > nominalPressure * 1.1 ? "value exceed" : "value";
+            temperatureElement.className = temperature > nominalTemperature * 1.1 ? "value exceed" : "value";
+        }
+
+        function getNextMaintenanceDate() {
+            const storedDate = localStorage.getItem('nextMaintenanceDate_22');
+            if (storedDate) {
+                return new Date(storedDate);
+            } else {
+                const today = new Date();
+                const nextMaintenanceDate = new Date(today);
+                nextMaintenanceDate.setMonth(nextMaintenanceDate.getMonth() + 1);
+                localStorage.setItem('nextMaintenanceDate_22', nextMaintenanceDate.toISOString().split('T')[0]);
+                return nextMaintenanceDate;
+            }
+        }
+
+        function updateMaintenanceStatus() {
+            const maintenanceStatusElement = document.getElementById("maintenance_status");
+            const nextMaintenanceDateElement = document.getElementById("next_maintenance_date");
+            const today = new Date();
+            const nextMaintenanceDate = getNextMaintenanceDate();
+            nextMaintenanceDateElement.innerText = nextMaintenanceDate.toISOString().split('T')[0];
+
+            const oneMonthBeforeMaintenance = new Date(nextMaintenanceDate);
+            oneMonthBeforeMaintenance.setMonth(oneMonthBeforeMaintenance.getMonth() - 1);
+
+            if (today > nextMaintenanceDate) {
+                maintenanceStatusElement.className = "status red";
+                maintenanceStatusElement.innerHTML = "Überfällig <span></span>";
+            } else if (today > oneMonthBeforeMaintenance) {
+                maintenanceStatusElement.className = "status orange";
+                maintenanceStatusElement.innerHTML = "Bald fällig <span></span>";
+            } else {
+                maintenanceStatusElement.className = "status green";
+                maintenanceStatusElement.innerHTML = "Normal <span></span>";
+            }
+        }
+
+        window.onload = function() {
+            updateValues();
+            updateMaintenanceStatus();
+            setInterval(updateValues, 3000);
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Umwälzpumpe Heizgruppe-22</h1>
+
+        <h2>Live-Daten</h2>
+        <table>
+            <tr>
+                <th>Parameter</th>
+                <th>Wert</th>
+            </tr>
+            <tr>
+                <td>Durchflussrate</td>
+                <td id="flow_rate" class="value">3000 l/h</td>
+            </tr>
+            <tr>
+                <td>Leistungsaufnahme</td>
+                <td id="power" class="value">40 Watt</td>
+            </tr>
+            <tr>
+                <td>Druck</td>
+                <td id="pressure" class="value">1.5 bar</td>
+            </tr>
+            <tr>
+                <td>Temperatur</td>
+                <td id="temperature" class="value">65.0 °C</td>
+            </tr>
+        </table>
+
+        <div id="status" class="status">Status: Normal <span></span></div>
+
+        <h2>Wartungsinformationen</h2>
+        <table>
+            <tr>
+                <th>Parameter</th>
+                <th>Wert</th>
+            </tr>
+            <tr>
+                <td>Status</td>
+                <td id="maintenance_status" class="status green">Normal <span></span></td>
+            </tr>
+            <tr>
+                <td>Letzte Wartung</td>
+                <td>2023-05-15</td>
+            </tr>
+            <tr>
+                <td>Nächste Wartung</td>
+                <td id="next_maintenance_date">2024-05-15</td>
+            </tr>
+            <tr>
+                <td>Durchgeführt von</td>
+                <td>Techniker Wagner</td>
+            </tr>
+        </table>
+
+        <h2>Allgemeine Spezifikationen</h2>
+        <table>
+            <tr>
+                <th>Parameter</th>
+                <th>Wert</th>
+            </tr>
+            <tr>
+                <td>Modell</td>
+                <td>Wilo-Pumpe</td>
+            </tr>
+            <tr>
+                <td>Nominale Durchflussrate</td>
+                <td>3 m³/h</td>
+            </tr>
+            <tr>
+                <td>Leistungsaufnahme</td>
+                <td>40 Watt</td>
+            </tr>
+            <tr>
+                <td>Spannung</td>
+                <td>230V</td>
+            </tr>
+            <tr>
+                <td>Materialien</td>
+                <td>-</td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>
